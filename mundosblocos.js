@@ -2,17 +2,37 @@
 function Agent(id) {
     this.id = id;
     this.state = "f"; // s stifait, rf rechercherFuit, rs rechercherSatisfait, f fairFuit  
-    this.target = -1;
-    this.up = -1;
-    this.down = -1;
+    this.target = {};
+    this.up = null;
+    this.down = null;
     this.fixed = false;
     this.restrictions = [];
+    this.neighbours = []; // holds all other blocks
 
+    this.attack = function (attackedAgent, restrictionArray) {
+        restrictionArray.forEach(r => {
+            attackedAgent.restrictions.push(r);
+        });
+        attackedAgent.state = "f"
+    }
     this.fairFuit = function () {
-        console.log("test");
     };
     this.rechercherSatisfacion = function () {
-        console.log("test");
+        if (this.down !== this.target) { // not on target yet?
+            if (this.up === null) { // persuit happinness, go somewhere not restricted
+                this.neighbours.forEach(neighbour => {
+                    if (neighbour.up === null && restrictions.includes(neighbour)===false) {
+                        this.down.up = null;
+                        this.down = neighbour;
+                        neighbour.up = this;
+                    }
+                });
+            } else { // attack it
+                this.attack(this.up, [this.target, this]) // restrict me and my objective
+            }
+        } else {
+            this.state = "s"
+        }
     };
 
     this.run = function () {
@@ -20,8 +40,8 @@ function Agent(id) {
             return;
         }
         else if (this.state == "f") {
-            if (this.restrictions.length == 0) {
-                this.state = "rs"
+            if (this.restrictions.length == 0) { // no restrictions? go find happiness
+                this.state = "rs" // go find happiness
             } else {
                 // escape
                 this.fairFuit();
@@ -36,32 +56,45 @@ function Agent(id) {
 
 var blocks = [];
 
-var ag1 = new Agent(1);
-ag1.fixed = true;
-blocks.push(ag1)
+var m1 = new Agent("m1");
+m1.fixed = true;
+blocks.push(m1)
 
-var ag2 = new Agent(2);
-ag2.fixed = true;
-blocks.push(ag2)
+var m2 = new Agent("m2");
+m2.fixed = true;
+blocks.push(m2)
 
-var ag3 = new Agent(3);
-ag3.fixed = true;
-blocks.push(ag3)
+var m3 = new Agent("m3");
+m3.fixed = true;
+blocks.push(m3)
 
 // a
-var ag4 = new Agent(4);
-ag4.target = 3;
-blocks.push(ag4)
+var agentA = new Agent("a");
+agentA.target = m3;
+blocks.push(agentA)
 
 //b
-var ag5 = new Agent(5);
-ag5.target = 4;
-blocks.push(ag5)
+var agentB = new Agent("b");
+agentB.target = agentA;
+blocks.push(agentB)
 
 //c
-var ag6 = new Agent(6);
-ag6.target = 5;
-blocks.push(ag6)
+var agentC = new Agent("c");
+agentC.target = agentB;
+blocks.push(agentC)
+
+// define references
+m2.up = agentB;
+agentB.down = m2;
+agentB.up = agentA;
+agentA.down = agentB;
+agentA.up = agentC;
+agentC.down = agentA;
+agentC.up = null;
+
+blocks.forEach(block => {
+    block.neighbours = blocks;
+});
 
 var jj = 100
 while (jj > 0) {
@@ -72,4 +105,3 @@ while (jj > 0) {
     });
     --jj;
 }
-

@@ -14,24 +14,51 @@ function Agent(id) {
             attackedAgent.restrictions.push(r);
         });
         attackedAgent.state = "f"
-    }
-    this.fairFuit = function () {
     };
-    this.rechercherSatisfacion = function () {
+    this.moveTo = function (moveToObj) {
+        this.down.up = null;
+        this.down = moveToObj;
+        moveToObj.up = this;
+    };
+    this.moveSomewhere = function () { // this can lock, if all possible places are restrict
+        if (this.up === null) { // check if can move first
+            for (var n of this.neighbours) {
+                if (n.up == null && this.restrictions.includes(n) == false) {
+                    this.moveTo(n)
+                    return true;
+                }
+            }
+            console.log(this.id + ": Erro fatal, sem lugar para mover!! Inconsistencia de modelagem");
+        }
+        return false;
+    };
+    this.fairFuit = function () {
+        if (this.up === null) { // find someplace to escape
+            if (this.moveSomewhere() == true) {
+                this.state = "rs"; // if scaped, go back on trying to find happiness
+            }
+        } else {
+            this.attack(this.up, [this]); // atack the upper block and demand to not come back on me
+        }
+    };
+    this.rechercherSatisfacion = function () { // persuit happinness
         if (this.down !== this.target) { // not on target yet?
-            if (this.up === null) { // persuit happinness, go somewhere not restricted
-                this.neighbours.forEach(neighbour => {
-                    if (neighbour.up === null && restrictions.includes(neighbour)===false) {
-                        this.down.up = null;
-                        this.down = neighbour;
-                        neighbour.up = this;
-                    }
-                });
+            if (this.up === null) { // can i move? (no upper blocks)
+                if (this.target.up === null) { // is my objective available?
+                    this.moveTo(this.target)
+                        return true;
+                } else { // move to someplace else that is not restricted
+                    this.moveSomewhere();
+                }
+                
+                if (this.down == this.target) {
+                    this.state = "s";
+                }
             } else { // attack it
                 this.attack(this.up, [this.target, this]) // restrict me and my objective
             }
         } else {
-            this.state = "s"
+            this.state = "s" // I'm happy :^)
         }
     };
 

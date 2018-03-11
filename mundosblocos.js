@@ -46,11 +46,11 @@ function Agent(id) {
             if (this.up === null) { // can i move? (no upper blocks)
                 if (this.target.up === null) { // is my objective available?
                     this.moveTo(this.target)
-                        return true;
+                    return true;
                 } else { // move to someplace else that is not restricted
                     this.moveSomewhere();
                 }
-                
+
                 if (this.down == this.target) {
                     this.state = "s";
                 }
@@ -123,11 +123,27 @@ blocks.forEach(block => {
     block.neighbours = blocks;
 });
 
+
+// checks if all blocks are happy
+function isSimulationDone(blocks) {
+    for (b of blocks) {
+        if (b.state !== "s" && b.fixed == false) {
+            return false;
+        }
+    }
+    return true;
+}
+
 var jj = 100
 while (jj > 0) {
     blocks.forEach(block => {
         if (block.fixed == false) {
             block.run()
+        }
+
+        if (isSimulationDone(blocks) == true) {
+            alert("simulation complete!")
+            jj = 0;
         }
     });
     --jj;

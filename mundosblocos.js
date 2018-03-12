@@ -1,88 +1,14 @@
 
-function Agent(id) {
-    this.id = id;
-    this.state = "f"; // s stifait, rf rechercherFuit, rs rechercherSatisfait, f fairFuit  
-    this.target = {};
-    this.up = null;
-    this.down = null;
-    this.fixed = false;
-    this.restrictions = [];
-    this.neighbours = []; // holds all other blocks
+// Aramis Hornung Moraes
+// Blocks World
+// sample app for Artificial inteligence classes
+// sunday, march 11th 2018
+// licensed under MIT :^)
 
-    this.attack = function (attackedAgent, restrictionArray) {
-        restrictionArray.forEach(r => {
-            attackedAgent.restrictions.push(r);
-        });
-        attackedAgent.state = "f"
-    };
-    this.moveTo = function (moveToObj) {
-        this.down.up = null;
-        this.down = moveToObj;
-        moveToObj.up = this;
-    };
-    this.moveSomewhere = function () { // this can lock, if all possible places are restrict
-        if (this.up === null) { // check if can move first
-            for (var n of this.neighbours) {
-                if (n.up == null && this.restrictions.includes(n) == false) {
-                    this.moveTo(n)
-                    return true;
-                }
-            }
-            console.log(this.id + ": Erro fatal, sem lugar para mover!! Inconsistencia de modelagem");
-        }
-        return false;
-    };
-    this.fairFuit = function () {
-        if (this.up === null) { // find someplace to escape
-            if (this.moveSomewhere() == true) {
-                this.state = "rs"; // if scaped, go back on trying to find happiness
-            }
-        } else {
-            this.attack(this.up, [this]); // atack the upper block and demand to not come back on me
-        }
-    };
-    this.rechercherSatisfacion = function () { // persuit happinness
-        if (this.down !== this.target) { // not on target yet?
-            if (this.up === null) { // can i move? (no upper blocks)
-                if (this.target.up === null) { // is my objective available?
-                    this.moveTo(this.target)
-                    return true;
-                } else { // move to someplace else that is not restricted
-                    this.moveSomewhere();
-                }
+var movements = []; // holds the movements performed to solve the puzzle
 
-                if (this.down == this.target) {
-                    this.state = "s";
-                }
-            } else { // attack it
-                this.attack(this.up, [this.target, this]) // restrict me and my objective
-            }
-        } else {
-            this.state = "s" // I'm happy :^)
-        }
-    };
-
-    this.run = function () {
-        if (this.state == "s") {
-            return;
-        }
-        else if (this.state == "f") {
-            if (this.restrictions.length == 0) { // no restrictions? go find happiness
-                this.state = "rs" // go find happiness
-            } else {
-                // escape
-                this.fairFuit();
-            }
-        }
-        else if (this.state == "rs") {
-            // try to get to the target
-            this.rechercherSatisfacion();
-        }
-    };
-}
-
-var blocks = [];
-
+// define a problem 
+/*
 var m1 = new Agent("m1");
 m1.fixed = true;
 blocks.push(m1)
@@ -119,10 +45,12 @@ agentA.up = agentC;
 agentC.down = agentA;
 agentC.up = null;
 
+// register global vars for each agent to have access
 blocks.forEach(block => {
     block.neighbours = blocks;
+    block.movements = movements;
 });
-
+*/
 
 // checks if all blocks are happy
 function isSimulationDone(blocks) {
@@ -134,17 +62,101 @@ function isSimulationDone(blocks) {
     return true;
 }
 
-var jj = 100
-while (jj > 0) {
-    blocks.forEach(block => {
-        if (block.fixed == false) {
-            block.run()
-        }
+//model example
+/*
+m1 m2 m3 a b c
+p - - -
+p b - -
+p - - -
+a c b m3
+a m2 m2 a
+a - a b
+ */
+// get the input data, first line defines agents name
+// second line defines, passive of active profile followed
+// by who is on top and down the given agent
+function parseModel (inputModel) {
+    var lines = inputModel.split(/\r?\n/);
+    var ids =  lines[0].split(" ");
+    agents = []
 
-        if (isSimulationDone(blocks) == true) {
-            alert("simulation complete!")
-            jj = 0;
+    // create the agents
+    var index = 0;
+    for (var id of ids) {
+        var newAgent = new Agent(id);
+        newAgent.fixed = (lines[index+1].split(" ")[0] == "p"?true:false); // passive (fixed) or active
+        agents.push(newAgent);
+        ++index;
+    }
+        
+
+    // define up down and objective
+    index = 0;
+    for (var agent of agents) {
+        var adjacences = lines[index+1].split(" ");
+        upId = adjacences[1];
+        downId = adjacences[2];
+        targetId = adjacences[3];
+
+        if (upId == "-") {
+            agent.up = null
+        } else {
+            for (var agnt of agents) {
+                if (agnt.id == upId) {
+                    agent.up = agnt
+                }
+            }
         }
-    });
-    --jj;
+        if (downId == "-") {
+            agent.up = null
+        } else {
+            for (var agnt of agents) {
+                if (agnt.id == downId) {
+                    agent.down = agnt
+                }
+            }
+        }
+        if (targetId == "-") {
+            agent.target = null
+        } else {
+            for (var agnt of agents) {
+                if (agnt.id == targetId) {
+                    agent.target = agnt
+                }
+            }
+        }
+        ++index;
+    }
+
+    // register global vars for each agent to have access
+    for (var block of agents) {
+        block.neighbours = agents; // model of world composed by the blocks
+        block.movements = movements; // global to register the solving steps
+    }
+    simulate(agents);
+}
+
+function simulate(blocks) {
+    var jj = 100 // limit iterations to prevent infinite loop or CPU abuse
+    while (jj > 0) {
+        for (var block of blocks) {
+            if (block.fixed == false) {
+                block.run()
+            }
+
+            if (isSimulationDone(blocks) == true) {
+                var outputresult = "";
+                var i =0;
+                console.log("simulation complete!");
+                // compose result text to display
+                for (move of movements) {
+                    outputresult += "element " + move.element + ", from: " + move.from + " to: " + move.to + "\n";
+                }
+                console.log(outputresult);
+                document.getElementById("RO").value = outputresult;
+                jj = 0;
+            }
+        }
+        --jj;
+    }
 }

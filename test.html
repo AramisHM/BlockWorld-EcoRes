@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Aramis&#39; personal page</title>
-
+<html>
 
 <head>
-    <script src="mundosblocos.js"></script>
-</head>
-<body>
-    test
-    <script src="mundosblocos.js"></script>
-</body>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Aramis&#39; personal page</title>
+
+    <head>
+    </head>
+
+    <body>
+        <p>Input your model</p>
+        <textarea name="modelInput" , id="MI" , cols="40" , rows="10" , value=""></textarea>
+        <input type="button" value="Solve" onclick="parseModel(document.getElementById('MI').value);">
+        <br>
+
+        <p>result</p>
+        <textarea name="resultOutput" , id="RO" , cols="40" rows="5"></textarea>
+
+        <script>
+            var defaultInput = "m1 m2 m3 a b c\np - - -\np b - -\np - - -\na c b m3\na m2 m2 a\na - a b";
+            document.getElementById("MI").value = defaultInput;
+        </script>
+        <script src="agent.js"></script>
+        <script src="mundosblocos.js"></script>
+    </body>
+
 </html>

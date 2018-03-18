@@ -80,6 +80,9 @@ function parseModel (inputModel) {
     var ids =  lines[0].split(" ");
     agents = []
 
+    // clear movements array
+    movements = []
+
     // create the agents
     var index = 0;
     for (var id of ids) {

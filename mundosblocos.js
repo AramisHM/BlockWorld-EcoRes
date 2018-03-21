@@ -111,7 +111,7 @@ function parseModel (inputModel) {
             }
         }
         if (downId == "-") {
-            agent.up = null
+            agent.down = null
         } else {
             for (var agnt of agents) {
                 if (agnt.id == downId) {

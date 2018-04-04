@@ -162,4 +162,19 @@ function simulate(blocks) {
         }
         --jj;
     }
+    if (jj <= 0) {
+        if (isSimulationDone(blocks) == false ){
+            var outputresult = "";
+            var i =0;
+            console.log("simulation incomplete!");
+            // compose result text to display
+            for (move of movements) {
+                outputresult += "element " + move.element + ", from: " + move.from + " to: " + move.to + "\n";
+            }
+            console.log(outputresult);
+            document.getElementById("RO").value = outputresult;
+            jj = 0;
+        
+        }
+    }
 }

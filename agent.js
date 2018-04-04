@@ -33,7 +33,7 @@ function Agent(id) {
     this.moveSomewhere = function () { // this can lock, if all possible places are restrict
         if (this.up === null) { // check if can move first
             for (var n of this.neighbours) {
-                if (n.up == null && this.restrictions.includes(n) == false) {
+                if (n.up == null && this.restrictions.includes(n) == false && this != n) {
                     this.moveTo(n)
                     return true;
                 }

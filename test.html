@@ -1,3 +1,10 @@
+<!--
+// Aramis Hornung Moraes
+// Blocks World - With eco-resolution approach
+// sample app for Artificial inteligence classes
+// sunday, march 11th 2018
+// licensed under MIT :^)
+-->
 <!DOCTYPE html>
 <html>
 
@@ -9,18 +16,43 @@
     </head>
 
     <body>
-        <p>Input your model</p>
-        <textarea name="modelInput" , id="MI" , cols="40" , rows="10" , value=""></textarea>
-        <input type="button" value="Solve" onclick="parseModel(document.getElementById('MI').value);">
-        <br>
+        <table style="width:800px">
+            <tr>
+              <th></th>
+              <th></th> 
+            </tr>
+            <tr>
+              <td>
+                <h2>BlockWorld Eco-Resolution approach</h2>
+                <h4>Developed by Aramis Hornung Moraes</h4>
+                <p>The code for this program is open sourced under MIT terms.</p>
 
-        <p>result</p>
-        <textarea name="resultOutput" , id="RO" , cols="40" rows="5"></textarea>
+                <p>The modelling of the problem is as follows:</p>
+
+                <p>The first line defines all elements names/identifications</p>
+
+                <p>The following lines defines each agent/element properties. It is defined as follows</p>
+
+                <p>(a - active; p - passive); who is up; who is down; objective</p>
+                <br>
+                <p>Input your model</p>
+                <textarea name="modelInput" , id="MI" , cols="40" , rows="10" , value=""></textarea>
+                <input type="button" value="Solve" onclick="parseModel(document.getElementById('MI').value); document.getElementById('exampleImage').style.display = 'none';">
+                <br>
+                <p>result</p>
+                <textarea name="resultOutput" , id="RO" , cols="40" rows="5"></textarea>
+              </td>
+              <td>
+                <img id="exampleImage" src="example.png" alt="Example">
+              </td>
+            </tr>
+          </table>
 
         <script>
             var defaultInput = "m1 m2 m3 a b c\np - - -\np b - -\np - - -\na c b m3\na a m2 a\na - a b";
             document.getElementById("MI").value = defaultInput;
         </script>
+
         <script src="agent.js"></script>
         <script src="mundosblocos.js"></script>
     </body>
